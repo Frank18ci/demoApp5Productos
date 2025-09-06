@@ -85,4 +85,8 @@ public class ProductoServiceImpl implements ProductoService{
                 productosPage.getTotalElements()
         );
     }
+    @Override
+    public List<ProductoDto> generarReporteProductosv1NoPaginado(String nombre) {
+        return ProductoMapper.toDtoList(productoRepository.findAllProductosByNombrePersonalizado(nombre));
+    }
 }

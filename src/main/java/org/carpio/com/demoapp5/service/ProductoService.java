@@ -14,5 +14,7 @@ public interface ProductoService {
     Page<ProductoDto> generarReporteProductosv1Paginado(String nombre, int page, int size, String sortBy, String direction);
     Page<ProductoDto> generarReporteProductosv2Paginado(String nombre, Double minPrecio, Double maxPrecio, int page, int size, String sortBy, String direction);
 
+    List<ProductoDto> generarReporteProductosv1NoPaginado(String nombre);
+
 
 }

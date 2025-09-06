@@ -56,4 +56,11 @@ public class ProductoController {
     ) {
         return ResponseEntity.ok(productoService.generarReporteProductosv2Paginado(nombre, minPrecio, maxPrecio, page, size, sortBy, direction));
     }
+
+    @GetMapping("/reporte/v1/no-paginado")
+    public ResponseEntity<?> generarReporteProductosv1NoPaginado(
+            @RequestParam(required = false) String nombre
+    ) {
+        return ResponseEntity.ok(productoService.generarReporteProductosv1NoPaginado(nombre));
+    }
 }
