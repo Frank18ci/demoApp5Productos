@@ -2,7 +2,6 @@ package org.carpio.com.demoapp5.util;
 
 import org.carpio.com.demoapp5.dto.ProductoDto;
 import org.carpio.com.demoapp5.model.Producto;
-import org.mapstruct.MapMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
