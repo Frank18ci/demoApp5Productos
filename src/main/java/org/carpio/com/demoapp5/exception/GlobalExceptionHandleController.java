@@ -9,8 +9,8 @@ import java.time.LocalDateTime;
 
 @ControllerAdvice
 public class ExceptionHandleController {
-    @ExceptionHandler(ResourceNotFound.class)
-    public ResponseEntity<?> resourseNotFoundException(ResourceNotFound e) {
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<?> resourseNotFoundException(ResourceNotFoundException e) {
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.NOT_FOUND.value(),
                 e.getMessage(),
