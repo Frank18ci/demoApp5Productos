@@ -2,7 +2,6 @@ package org.carpio.com.demoapp5.service;
 
 import lombok.RequiredArgsConstructor;
 import org.carpio.com.demoapp5.dto.ProductoDto;
-import org.carpio.com.demoapp5.dto.mapper.ProductoMapper;
 import org.carpio.com.demoapp5.exception.BadRequestException;
 import org.carpio.com.demoapp5.exception.ResourceNotFoundException;
 import org.carpio.com.demoapp5.model.Producto;
@@ -17,15 +16,15 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ProductoServiceImpl implements ProductoService{
     private final ProductoRepository productoRepository;
-
+    private final org.carpio.com.demoapp5.util.ProductoMapper productoMapper;
     @Override
     public List<ProductoDto> getAllProductos() {
-        return ProductoMapper.toDtoList(productoRepository.findAll());
+        return productoMapper.toDtoList(productoRepository.findAll());
     }
 
     @Override
     public ProductoDto getProductoById(Long id) {
-        return ProductoMapper.toDto(productoRepository.findById(id).orElseThrow(
+        return productoMapper.toDto(productoRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Producto no encontrado con id: " + id)
         ));
     }
@@ -35,7 +34,7 @@ public class ProductoServiceImpl implements ProductoService{
         if(productoDto.getPrecio() < 0){
             throw new BadRequestException("El precio no puede ser negativo");
         }
-        return ProductoMapper.toDto(productoRepository.save(ProductoMapper.toEntity(productoDto)));
+        return productoMapper.toDto(productoRepository.save(productoMapper.toEntity(productoDto)));
     }
 
     @Override
@@ -46,10 +45,10 @@ public class ProductoServiceImpl implements ProductoService{
         if(productoDto.getPrecio() < 0){
             throw new BadRequestException("El precio no puede ser negativo");
         }
-        productoFound.setNombre(productoDto.getNombre());
-        productoFound.setPrecio(productoDto.getPrecio());
+        productoFound.setName(productoDto.getNombre());
+        productoFound.setPrice(productoDto.getPrecio());
 
-        return ProductoMapper.toDto(productoRepository.save(productoFound));
+        return productoMapper.toDto(productoRepository.save(productoFound));
     }
 
     @Override
@@ -68,10 +67,10 @@ public class ProductoServiceImpl implements ProductoService{
         }
         Sort sort = Sort.by(sortDirection, sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<Producto> productosPage = productoRepository.findByNombreContaining(nombre, pageable);
+        Page<Producto> productosPage = productoRepository.findByNameContaining(nombre, pageable);
 
         return new PageImpl<>(
-                ProductoMapper.toDtoList(productosPage.getContent()),
+                productoMapper.toDtoList(productosPage.getContent()),
                 pageable,
                 productosPage.getTotalElements()
                 );
@@ -85,23 +84,23 @@ public class ProductoServiceImpl implements ProductoService{
         }
         Sort sort = Sort.by(sortDirection, sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<Producto> productosPage = productoRepository.findByNombreContainingAndPrecioBetween(nombre, minPrecio, maxPrecio, pageable);
+        Page<Producto> productosPage = productoRepository.findByNameContainingAndPriceBetween(nombre, minPrecio, maxPrecio, pageable);
 
         return new PageImpl<>(
-                ProductoMapper.toDtoList(productosPage.getContent()),
+                productoMapper.toDtoList(productosPage.getContent()),
                 pageable,
                 productosPage.getTotalElements()
         );
     }
     @Override
     public List<ProductoDto> generarReporteProductosv1NoPaginado(String nombre) {
-        return ProductoMapper.toDtoList(productoRepository.findAllProductosByNombrePersonalizado(nombre));
+        return productoMapper.toDtoList(productoRepository.findAllProductosByNombrePersonalizado(nombre));
     }
 
     @Override
     public String getOneProduct(Long id) {
         Optional<Producto> p = productoRepository.findById(id);
-        String nombre = p.get().getNombre();
+        String nombre = p.get().getName();
         return nombre;
     }
 }

@@ -12,10 +12,10 @@ import java.util.List;
 
 @Repository
 public interface ProductoRepository extends JpaRepository<Producto, Long> {
-    Page<Producto> findByNombreContaining(String nombre, Pageable pageable);
-    Page<Producto> findByNombreContainingAndPrecioBetween(String nombre, Double minPrecio, Double maxPrecio, Pageable pageable);
+    Page<Producto> findByNameContaining(String name, Pageable pageable);
+    Page<Producto> findByNameContainingAndPriceBetween(String name, Double minPrice, Double maxPrice, Pageable pageable);
 
-    @Query("SELECT p FROM Producto p WHERE LOWER(p.nombre) like lower(concat(:nombre, '%'))")
-    List<Producto> findAllProductosByNombrePersonalizado(@Param("nombre") String nombre);
+    @Query("SELECT p FROM Producto p WHERE LOWER(p.name) like lower(concat(:name, '%'))")
+    List<Producto> findAllProductosByNombrePersonalizado(@Param("name") String name);
 
 }
