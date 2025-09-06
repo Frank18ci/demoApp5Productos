@@ -8,13 +8,24 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import java.time.LocalDateTime;
 
 @ControllerAdvice
-public class ExceptionHandleController {
+public class GlobalExceptionHandleController {
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<?> resourseNotFoundException(ResourceNotFoundException e) {
+    public ResponseEntity<?> resourceNotFoundException(ResourceNotFoundException e) {
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.NOT_FOUND.value(),
                 e.getMessage(),
-                LocalDateTime.now()
+                "recurso no encontrado",
+                LocalDateTime.now().toString()
+        );
+        return ResponseEntity.status(error.getStatus()).body(error);
+    }
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<?> badRequestException(BadRequestException e) {
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                e.getMessage(),
+                "mala peticion",
+                LocalDateTime.now().toString()
         );
         return ResponseEntity.status(error.getStatus()).body(error);
     }

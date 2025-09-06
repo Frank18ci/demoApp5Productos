@@ -2,6 +2,7 @@ package org.carpio.com.demoapp5.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.carpio.com.demoapp5.dto.ProductoDto;
+import org.carpio.com.demoapp5.exception.BadRequestException;
 import org.carpio.com.demoapp5.service.ProductoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -62,5 +63,13 @@ public class ProductoController {
             @RequestParam(required = false) String nombre
     ) {
         return ResponseEntity.ok(productoService.generarReporteProductosv1NoPaginado(nombre));
+    }
+
+    @GetMapping("/testv1/{id}")
+    public ResponseEntity<String> getTestV1(@PathVariable Long id){
+        if(id == null || id == 0){
+            throw new BadRequestException("El Id no puede ser nulo o vacío");
+        }
+        return ResponseEntity.ok(productoService.getOneProduct(id));
     }
 }

@@ -3,13 +3,15 @@ package org.carpio.com.demoapp5.service;
 import lombok.RequiredArgsConstructor;
 import org.carpio.com.demoapp5.dto.ProductoDto;
 import org.carpio.com.demoapp5.dto.mapper.ProductoMapper;
-import org.carpio.com.demoapp5.exception.ResourceNotFound;
+import org.carpio.com.demoapp5.exception.BadRequestException;
+import org.carpio.com.demoapp5.exception.ResourceNotFoundException;
 import org.carpio.com.demoapp5.model.Producto;
 import org.carpio.com.demoapp5.repository.ProductoRepository;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -24,20 +26,26 @@ public class ProductoServiceImpl implements ProductoService{
     @Override
     public ProductoDto getProductoById(Long id) {
         return ProductoMapper.toDto(productoRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFound("Producto no encontrado con id: " + id)
+                () -> new ResourceNotFoundException("Producto no encontrado con id: " + id)
         ));
     }
 
     @Override
     public ProductoDto createProducto(ProductoDto productoDto) {
+        if(productoDto.getPrecio() < 0){
+            throw new BadRequestException("El precio no puede ser negativo");
+        }
         return ProductoMapper.toDto(productoRepository.save(ProductoMapper.toEntity(productoDto)));
     }
 
     @Override
     public ProductoDto updateProducto(Long id, ProductoDto productoDto) {
         Producto productoFound = productoRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFound("Producto no encontrado con id: " + id)
+                () -> new ResourceNotFoundException("Producto no encontrado con id: " + id)
         );
+        if(productoDto.getPrecio() < 0){
+            throw new BadRequestException("El precio no puede ser negativo");
+        }
         productoFound.setNombre(productoDto.getNombre());
         productoFound.setPrecio(productoDto.getPrecio());
 
@@ -47,7 +55,7 @@ public class ProductoServiceImpl implements ProductoService{
     @Override
     public void deleteProducto(Long id) {
         Producto productoFound = productoRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFound("Producto no encontrado con id: " + id)
+                () -> new ResourceNotFoundException("Producto no encontrado con id: " + id)
         );
         productoRepository.delete(productoFound);
     }
@@ -88,5 +96,12 @@ public class ProductoServiceImpl implements ProductoService{
     @Override
     public List<ProductoDto> generarReporteProductosv1NoPaginado(String nombre) {
         return ProductoMapper.toDtoList(productoRepository.findAllProductosByNombrePersonalizado(nombre));
+    }
+
+    @Override
+    public String getOneProduct(Long id) {
+        Optional<Producto> p = productoRepository.findById(id);
+        String nombre = p.get().getNombre();
+        return nombre;
     }
 }

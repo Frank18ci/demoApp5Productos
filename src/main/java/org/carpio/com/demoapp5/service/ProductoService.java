@@ -16,5 +16,6 @@ public interface ProductoService {
 
     List<ProductoDto> generarReporteProductosv1NoPaginado(String nombre);
 
+    String getOneProduct(Long id);
 
 }
