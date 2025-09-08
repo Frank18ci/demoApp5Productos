@@ -1,0 +1,92 @@
+package org.carpio.com.demoapp5.service;
+
+import lombok.RequiredArgsConstructor;
+import org.carpio.com.demoapp5.dto.ProductoDto;
+import org.carpio.com.demoapp5.dto.mapper.ProductoMapper;
+import org.carpio.com.demoapp5.exception.ResourceNotFound;
+import org.carpio.com.demoapp5.model.Producto;
+import org.carpio.com.demoapp5.repository.ProductoRepository;
+import org.springframework.data.domain.*;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class ProductoServiceImpl implements ProductoService{
+    private final ProductoRepository productoRepository;
+
+    @Override
+    public List<ProductoDto> getAllProductos() {
+        return ProductoMapper.toDtoList(productoRepository.findAll());
+    }
+
+    @Override
+    public ProductoDto getProductoById(Long id) {
+        return ProductoMapper.toDto(productoRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFound("Producto no encontrado con id: " + id)
+        ));
+    }
+
+    @Override
+    public ProductoDto createProducto(ProductoDto productoDto) {
+        return ProductoMapper.toDto(productoRepository.save(ProductoMapper.toEntity(productoDto)));
+    }
+
+    @Override
+    public ProductoDto updateProducto(Long id, ProductoDto productoDto) {
+        Producto productoFound = productoRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFound("Producto no encontrado con id: " + id)
+        );
+        productoFound.setNombre(productoDto.getNombre());
+        productoFound.setPrecio(productoDto.getPrecio());
+
+        return ProductoMapper.toDto(productoRepository.save(productoFound));
+    }
+
+    @Override
+    public void deleteProducto(Long id) {
+        Producto productoFound = productoRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFound("Producto no encontrado con id: " + id)
+        );
+        productoRepository.delete(productoFound);
+    }
+
+    @Override
+    public Page<ProductoDto> generarReporteProductosv1Paginado(String nombre, int page, int size, String sortBy, String direction) {
+        Sort.Direction sortDirection = Sort.Direction.ASC;
+        if(direction != null && "desc".equalsIgnoreCase(direction.trim())) {
+            sortDirection = Sort.Direction.DESC;
+        }
+        Sort sort = Sort.by(sortDirection, sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<Producto> productosPage = productoRepository.findByNombreContaining(nombre, pageable);
+
+        return new PageImpl<>(
+                ProductoMapper.toDtoList(productosPage.getContent()),
+                pageable,
+                productosPage.getTotalElements()
+                );
+    }
+
+    @Override
+    public Page<ProductoDto> generarReporteProductosv2Paginado(String nombre, Double minPrecio, Double maxPrecio, int page, int size, String sortBy, String direction) {
+        Sort.Direction sortDirection = Sort.Direction.ASC;
+        if(direction != null && "desc".equalsIgnoreCase(direction.trim())) {
+            sortDirection = Sort.Direction.DESC;
+        }
+        Sort sort = Sort.by(sortDirection, sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<Producto> productosPage = productoRepository.findByNombreContainingAndPrecioBetween(nombre, minPrecio, maxPrecio, pageable);
+
+        return new PageImpl<>(
+                ProductoMapper.toDtoList(productosPage.getContent()),
+                pageable,
+                productosPage.getTotalElements()
+        );
+    }
+    @Override
+    public List<ProductoDto> generarReporteProductosv1NoPaginado(String nombre) {
+        return ProductoMapper.toDtoList(productoRepository.findAllProductosByNombrePersonalizado(nombre));
+    }
+}
